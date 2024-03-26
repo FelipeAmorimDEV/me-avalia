@@ -1,15 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]),0)
+
+const apiKey = import.meta.env.VITE_API_KEY
 
 function App() {
   const [movies, setMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
   
-
-  const apiKey = import.meta.env.VITE_API_KEY
+  useEffect(() => {
+    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) => ({
+        id: movie.imdbID,
+        title: movie.Title,
+        year: movie.Year,
+        poster: movie.Poster
+      }))))
+      .catch(console.log)
+  }, [])
 
   const handleClickMovie = currentClickedMovie => {
     const prevClickedMovie = clickedMovie
