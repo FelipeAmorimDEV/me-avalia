@@ -2,26 +2,27 @@ import {  useState } from 'react'
 
 function App() {
   const [movies, setMovies] = useState([])
-  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [clickedMovie, setClickedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
   
 
   const apiKey = import.meta.env.VITE_API_KEY
 
-  const handleClickBtnMovie = (movie) => {
-    if (selectedMovie?.id === movie.id) {
-      return setSelectedMovie(null)
+  const handleClickMovie = currentClickedMovie => {
+    const prevClickedMovie = clickedMovie
+    if (clickedMovie?.id === movie.id) {
+      return setClickedMovie(null)
     }
 
     const watchedMovie = watchedMovies.find((m) => m.id === movie.id)
     
     if (watchedMovie) {
-      return setSelectedMovie(watchedMovie)
+      return setClickedMovie(watchedMovie)
     }
 
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
       .then(r => r.json())
-      .then(data => setSelectedMovie(
+      .then(data => setClickedMovie(
         {
           id: data.imdbID,
           title: data.Title,
@@ -39,28 +40,28 @@ function App() {
       .catch(console.log)
   }
     
-  const handleClickBtnBack = () => setSelectedMovie(null)
+  const handleClickBtnBack = () => setClickedMovie(null)
   const handleSubmitMovieRating = (e) => {
     e.preventDefault()
     const { rating } = e.target.elements
 
-    const isMovieInWatchedList = watchedMovies.some((movie) => selectedMovie.id === movie.id) 
+    const isMovieInWatchedList = watchedMovies.some((movie) => clickedMovie.id === movie.id) 
     
     if (isMovieInWatchedList) {
-      setWatchedMovies((wm) => wm.map((movie) => movie.id === selectedMovie.id 
+      setWatchedMovies((wm) => wm.map((movie) => movie.id === clickedMovie.id 
         ? {...movie, userRating: +rating.value} 
         : movie
       ))
-      setSelectedMovie(null)
+      setClickedMovie(null)
 
       return
     }
 
     setWatchedMovies((wm) => [
       ...wm,
-      { ...selectedMovie, userRating: +rating.value },
+      { ...clickedMovie, userRating: +rating.value },
     ])
-    setSelectedMovie(null)
+    setClickedMovie(null)
   }
   const handleClickBtnDeleteMovie = (movieId) =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
@@ -114,7 +115,7 @@ function App() {
           <ul className="list list-movies">
             {movies.length > 0 &&
               movies.map((movie) => (
-                <li key={movie.id} onClick={() => handleClickBtnMovie(movie)}>
+                <li key={movie.id} onClick={() => handleClickMovie(movie)}>
                   <img src={movie.poster} alt={`Poster de ${movie.title}`} />
                   <h3>{movie.title}</h3>
                   <p>
@@ -126,25 +127,25 @@ function App() {
           </ul>
         </div>
         <div className="box">
-          {selectedMovie ? (
+          {clickedMovie ? (
             <div className="details">
               <header>
                 <button className="btn-back" onClick={handleClickBtnBack}>
                   &larr;
                 </button>
                 <img
-                  src={selectedMovie.poster}
-                  alt={`Poster de ${selectedMovie.title}`}
+                  src={clickedMovie.poster}
+                  alt={`Poster de ${clickedMovie.title}`}
                 />
                 <div className="details-overview">
-                  <h2>{selectedMovie.title}</h2>
+                  <h2>{clickedMovie.title}</h2>
                   <p>
-                    {selectedMovie.released} &bull; {selectedMovie.runtime}
+                    {clickedMovie.released} &bull; {clickedMovie.runtime}
                   </p>
-                  <p>{selectedMovie.genre}</p>
+                  <p>{clickedMovie.genre}</p>
                   <p>
                     <span>⭐</span>
-                    {selectedMovie.imdbRating} IMDb rating
+                    {clickedMovie.imdbRating} IMDb rating
                   </p>
                 </div>
               </header>
@@ -156,22 +157,22 @@ function App() {
                   >
                     <p>Qual nota você dá para este filme?</p>
                     <div>
-                      <select name="rating" defaultValue={selectedMovie.userRating ?? 0} key={crypto.randomUUID()}>
+                      <select name="rating" defaultValue={clickedMovie.userRating ?? 0} key={crypto.randomUUID()}>
                         {Array.from({ length: 10 }, (_, i) => (
                           <option key={i} value={i + 1}>
                             {i + 1}
                           </option>
                         ))}
                       </select>
-                      <button className="btn-add">{selectedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
+                      <button className="btn-add">{clickedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
                     </div>
                   </form>
                 </div>
                 <p>
-                  <em>{selectedMovie.plot}</em>
+                  <em>{clickedMovie.plot}</em>
                 </p>
-                <p>Elenco: {selectedMovie.actors}</p>
-                <p>Direção: {selectedMovie.director}</p>
+                <p>Elenco: {clickedMovie.actors}</p>
+                <p>Direção: {clickedMovie.director}</p>
               </section>
             </div>
           ) : (
@@ -190,7 +191,7 @@ function App() {
               <ul className="list list-movies">
                 {watchedMovies.length > 0 &&
                   watchedMovies.map((watchedMovie) => (
-                    <li key={watchedMovie.id} onClick={() => handleClickBtnMovie(watchedMovie)}>
+                    <li key={watchedMovie.id} onClick={() => handleClickMovie(watchedMovie)}>
                       <img
                         src={watchedMovie.poster}
                         alt={`Poster de ${watchedMovie.title}`}
