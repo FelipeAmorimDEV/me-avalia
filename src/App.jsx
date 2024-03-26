@@ -48,6 +48,10 @@ function App() {
   const handleClickBtnDeleteMovie = (movieId) =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
 
+  // eslint-disable-next-line
+  const watchedMoviesRuntime = watchedMovies
+    .reduce((acc, movie) => (acc += +movie?.runtime.replace(' min', '')),0)
+
   return (
     <>
       <nav className="nav-bar">
@@ -139,10 +143,10 @@ function App() {
                 <h2>Histórico</h2>
                 <div>
                   <p>
-                    <span>#️⃣</span> <span>0 filmes</span>
+                    <span>#️⃣</span> <span>{watchedMovies.length} filmes</span>
                   </p>
                   <p>
-                    <span>⏳</span> <span>0 min</span>
+                    <span>⏳</span> <span>{watchedMoviesRuntime} min</span>
                   </p>
                 </div>
               </div>
