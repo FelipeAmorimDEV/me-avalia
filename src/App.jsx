@@ -156,7 +156,7 @@ function App() {
                   >
                     <p>Qual nota você dá para este filme?</p>
                     <div>
-                      <select name="rating" defaultValue={1}>
+                      <select name="rating" defaultValue={selectedMovie.userRating ?? 0} key={crypto.randomUUID()}>
                         {Array.from({ length: 10 }, (_, i) => (
                           <option key={i} value={i + 1}>
                             {i + 1}
