@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 function App() {
   const [movies, setMovies] = useState([])
+  const [selectedMovie, setSelectedMovie] = useState(null)
 
   useEffect(() => {
     fetch(
@@ -26,6 +27,11 @@ function App() {
         ),
       )
   }, [])
+
+  const handleClickBtnMovie = (movie) =>
+    setSelectedMovie((sm) => (sm?.id === movie.id ? null : movie))
+
+  const handleClickBtnBack = () => setSelectedMovie(null)
 
   return (
     <>
@@ -52,7 +58,7 @@ function App() {
           <ul className="list list-movies">
             {movies.length > 0 &&
               movies.map((movie) => (
-                <li key={movie.id}>
+                <li key={movie.id} onClick={() => handleClickBtnMovie(movie)}>
                   <img src={movie.poster} alt={`Poster de ${movie.title}`} />
                   <h3>{movie.title}</h3>
                   <p>
@@ -64,85 +70,90 @@ function App() {
           </ul>
         </div>
         <div className="box">
-          <div className="history">
-            <h2>Histórico</h2>
-            <div>
-              <p>
-                <span>#️⃣</span> <span>0 filmes</span>
-              </p>
-              <p>
-                <span>⏳</span> <span>0 min</span>
-              </p>
+          {selectedMovie ? (
+            <div className="details">
+              <header>
+                <button className="btn-back" onClick={handleClickBtnBack}>
+                  &larr;
+                </button>
+                <img
+                  src={selectedMovie.poster}
+                  alt={`Poster de ${selectedMovie.title}`}
+                />
+                <div className="details-overview">
+                  <h2>{selectedMovie.title}</h2>
+                  <p>
+                    {selectedMovie.released} &bull; {selectedMovie.runtime}
+                  </p>
+                  <p>{selectedMovie.genre}</p>
+                  <p>
+                    <span>⭐</span>
+                    {selectedMovie.imdbRating} IMDb rating
+                  </p>
+                </div>
+              </header>
+              <section>
+                <div className="rating">
+                  <form className="form-rating">
+                    <p>Qual nota você dá para este filme?</p>
+                    <div>
+                      <select name="rating" defaultValue={1}>
+                        {Array.from({ length: 10 }, (_, i) => (
+                          <option key={i} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                      <button className="btn-add">+ Adicionar á lista</button>
+                    </div>
+                  </form>
+                </div>
+                <p>
+                  <em>{selectedMovie.plot}</em>
+                </p>
+                <p>Elenco: {selectedMovie.actors}</p>
+                <p>Direção: {selectedMovie.director}</p>
+              </section>
             </div>
-          </div>
-          <ul className="list list-movies">
-            <li>
-              <img
-                src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                alt="Poster de The Matrix"
-              />
-              <h3>The Matrix</h3>
-              <div>
-                <p>
-                  <span>⭐</span>
-                  <span>8.7</span>
-                </p>
-                <p>
-                  <span>🌟</span>
-                  <span>9.5</span>
-                </p>
-                <p>
-                  <span>⏳</span>
-                  <span>136 min</span>
-                </p>
-                <button className="btn-delete">X</button>
+          ) : (
+            <>
+              <div className="history">
+                <h2>Histórico</h2>
+                <div>
+                  <p>
+                    <span>#️⃣</span> <span>0 filmes</span>
+                  </p>
+                  <p>
+                    <span>⏳</span> <span>0 min</span>
+                  </p>
+                </div>
               </div>
-            </li>
-          </ul>
-          {/* <div className="details">
-            <header>
-              <button className="btn-back">&larr;</button>
-              <img
-                src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                alt="Poster de The Matrix"
-              />
-              <div className="details-overview">
-                <h2>The Matrix</h2>
-                <p>31 Mar 1999 &bull; 136 min</p>
-                <p>Action, Sci-Fi</p>
-                <p>
-                  <span>⭐</span>8.7 IMDb rating
-                </p>
-              </div>
-            </header>
-            <section>
-              <div className="rating">
-                <form className="form-rating">
-                  <p>Qual nota você dá para este filme?</p>
+              <ul className="list list-movies">
+                <li>
+                  <img
+                    src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+                    alt="Poster de The Matrix"
+                  />
+                  <h3>The Matrix</h3>
                   <div>
-                    <select name="rating" defaultValue={1}>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <option key={i} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                    <button className="btn-add">+ Adicionar á lista</button>
+                    <p>
+                      <span>⭐</span>
+                      <span>8.7</span>
+                    </p>
+                    <p>
+                      <span>🌟</span>
+                      <span>9.5</span>
+                    </p>
+                    <p>
+                      <span>⏳</span>
+                      <span>136 min</span>
+                    </p>
+                    <button className="btn-delete">X</button>
                   </div>
-                </form>
-              </div>
-              <p>
-                <em>
-                  When a beautiful stranger leads computer hacker Neo to a
-                  forbidding underworld, he discovers the shocking truth--the
-                  life he knows is the elaborate deception of an evil
-                  cyber-intelligence.
-                </em>
-              </p>
-              <p>Elenco: Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss</p>
-              <p>Direção: Lana Wachowski, Lilly Wachowski</p>
-            </section>
-          </div> */}
+                </li>
+              </ul>
+            </>
+          )}
         </div>
       </main>
     </>
