@@ -6,34 +6,32 @@ function App() {
   const [watchedMovies, setWatchedMovies] = useState([])
 
   const apiKey = import.meta.env.VITE_API_KEY
-  console.log(apiKey)
 
-  // useEffect(() => {
-  //   fetch(
-  //     'https://raw.githubusercontent.com/FelipeAmorimDEV/fake-data/main/fake-movies.json',
-  //   )
-  //     .then((r) => r.json())
-  //     .then((data) =>
-  //       setMovies(
-  //         data.map((movie) => ({
-  //           id: movie.imdbID,
-  //           title: movie.Title,
-  //           year: movie.Year,
-  //           released: movie.Released,
-  //           runtime: movie.Runtime,
-  //           genre: movie.Genre,
-  //           director: movie.Director,
-  //           actors: movie.Actors,
-  //           plot: movie.Plot,
-  //           poster: movie.Poster,
-  //           imdbRating: movie.imdbRating,
-  //         })),
-  //       ),
-  //     )
-  // }, [])
+  const handleClickBtnMovie = (movie) => {
+    if (selectedMovie?.id === movie.id) {
+      return setSelectedMovie(null)
+    }
 
-  const handleClickBtnMovie = (movie) =>
-    setSelectedMovie((sm) => (sm?.id === movie.id ? null : movie))
+    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
+      .then(r => r.json())
+      .then(data => setSelectedMovie(
+        {
+          id: data.imdbID,
+          title: data.Title,
+          year: data.Year,
+          released: data.Released,
+          runtime: data.Runtime,
+          genre: data.Genre,
+          director: data.Director,
+          actors: data.Actors,
+          poster: data.Poster,
+          imdbRating: data.imdbRating,
+          plot: data.Plot,
+        }
+    ))
+      .catch(console.log)
+  }
+    
   const handleClickBtnBack = () => setSelectedMovie(null)
   const handleSubmitMovieRating = (e) => {
     e.preventDefault()
