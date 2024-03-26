@@ -1,15 +1,37 @@
 import { useEffect, useState } from 'react'
 
 const getTotalMinutes = watchedMovies => watchedMovies
-  .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]),0)
+  .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
 
 const apiKey = import.meta.env.VITE_API_KEY
 
-function App() {
+const NavBar = ({ onSearchMovie, movies }) => {
+  return (
+    <nav className="nav-bar">
+      <img src="logo-me-avalia.png" alt="Logo me avalia" className="logo" />
+      <form className="form-search" onSubmit={onSearchMovie}>
+        <input
+          type="text"
+          name="searchMovie"
+          placeholder="Buscar filmes..."
+          autoFocus
+          className="search"
+        />
+        <button type="submit" className="btn-search">
+          Buscar
+        </button>
+      </form>
+      <p className="num-results">
+        <strong>{movies.length}</strong> Resultados
+      </p>
+    </nav>)
+}
+
+const App = () => {
   const [movies, setMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
-  
+
   useEffect(() => {
     fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
       .then((r) => r.json())
@@ -31,10 +53,10 @@ function App() {
 
     const watchedMovie = watchedMovies
       .find((watchedMovie) => watchedMovie.id === currentClickedMovie.id)
-    
+
     if (watchedMovie) {
       setClickedMovie(watchedMovie)
-      return 
+      return
     }
 
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
@@ -53,7 +75,7 @@ function App() {
           imdbRating: data.imdbRating,
           plot: data.Plot
         }
-    ))
+      ))
       .catch(console.log)
   }
 
@@ -61,11 +83,11 @@ function App() {
     e.preventDefault()
     const { rating } = e.target.elements
 
-    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id) 
-    
+    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id)
+
     if (isMovieInWatchedList) {
-      setWatchedMovies(wm => wm.map(movie => 
-        movie.id === clickedMovie.id ? {...movie, userRating: +rating.value} : movie
+      setWatchedMovies(wm => wm.map(movie =>
+        movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie
       ))
       setClickedMovie(null)
 
@@ -96,30 +118,13 @@ function App() {
   }
 
   const handleClickBtnBack = () => setClickedMovie(null)
-  const handleClickBtnDelete = movieId => 
+  const handleClickBtnDelete = movieId =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
 
   return (
     <>
-      <nav className="nav-bar">
-        <img src="logo-me-avalia.png" alt="Logo me avalia" className="logo" />
-        <form className="form-search" onSubmit={handleSearchMovie}>
-          <input
-            type="text"
-            name="searchMovie"
-            placeholder="Buscar filmes..."
-            autoFocus
-            className="search"
-          />
-          <button type="submit" className="btn-search">
-            Buscar
-          </button>
-        </form>
-        <p className="num-results">
-          <strong>{movies.length}</strong> Resultados
-        </p>
-      </nav>
 
+      <NavBar movies={movies} onSearchMovie={handleSearchMovie }/>
       <main className="main">
         <div className="box">
           <ul className="list list-movies">
