@@ -5,48 +5,65 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
 
-  useEffect(() => {
-    fetch(
-      'https://raw.githubusercontent.com/FelipeAmorimDEV/fake-data/main/fake-movies.json',
-    )
-      .then((r) => r.json())
-      .then((data) =>
-        setMovies(
-          data.map((movie) => ({
-            id: movie.imdbID,
-            title: movie.Title,
-            year: movie.Year,
-            released: movie.Released,
-            runtime: movie.Runtime,
-            genre: movie.Genre,
-            director: movie.Director,
-            actors: movie.Actors,
-            plot: movie.Plot,
-            poster: movie.Poster,
-            imdbRating: movie.imdbRating,
-          })),
-        ),
-      )
-  }, [])
+  const apiKey = import.meta.env.VITE_API_KEY
+  console.log(apiKey)
+
+  // useEffect(() => {
+  //   fetch(
+  //     'https://raw.githubusercontent.com/FelipeAmorimDEV/fake-data/main/fake-movies.json',
+  //   )
+  //     .then((r) => r.json())
+  //     .then((data) =>
+  //       setMovies(
+  //         data.map((movie) => ({
+  //           id: movie.imdbID,
+  //           title: movie.Title,
+  //           year: movie.Year,
+  //           released: movie.Released,
+  //           runtime: movie.Runtime,
+  //           genre: movie.Genre,
+  //           director: movie.Director,
+  //           actors: movie.Actors,
+  //           plot: movie.Plot,
+  //           poster: movie.Poster,
+  //           imdbRating: movie.imdbRating,
+  //         })),
+  //       ),
+  //     )
+  // }, [])
 
   const handleClickBtnMovie = (movie) =>
     setSelectedMovie((sm) => (sm?.id === movie.id ? null : movie))
   const handleClickBtnBack = () => setSelectedMovie(null)
-
   const handleSubmitMovieRating = (e) => {
     e.preventDefault()
-
     const { rating } = e.target.elements
-
     setWatchedMovies((wm) => [
       ...wm,
       { ...selectedMovie, userRating: +rating.value },
     ])
     setSelectedMovie(null)
   }
-
   const handleClickBtnDeleteMovie = (movieId) =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
+  const handleSearchMovie = (e) => {
+    e.preventDefault()
+    const { searchMovie } = e.target.elements
+
+    if (searchMovie.length < 2) {
+      return
+    }
+
+    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) => ({
+        id: movie.imdbID,
+        title: movie.Title,
+        year: movie.Year,
+        poster: movie.Poster
+      }))))
+      .catch(console.log)
+  }
 
   // eslint-disable-next-line
   const watchedMoviesRuntime = watchedMovies
@@ -56,9 +73,10 @@ function App() {
     <>
       <nav className="nav-bar">
         <img src="logo-me-avalia.png" alt="Logo me avalia" className="logo" />
-        <form className="form-search">
+        <form className="form-search" onSubmit={handleSearchMovie}>
           <input
             type="text"
+            name="searchMovie"
             placeholder="Buscar filmes..."
             autoFocus
             className="search"
