@@ -44,7 +44,45 @@ const History = ({ watchedMovies }) => {
         </p>
       </div>
     </div>
-    )
+  )
+}
+
+const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
+  return (
+    watchedMovies.map((watchedMovie) => (
+      <li key={watchedMovie.id} onClick={() => onClickMovie(watchedMovie)}>
+        <img
+          src={watchedMovie.poster}
+          alt={`Poster de ${watchedMovie.title}`}
+        />
+        <h3>{watchedMovie.title}</h3>
+        <div>
+          <p>
+            <span>⭐</span>
+            <span>{watchedMovie.imdbRating}</span>
+          </p>
+          <p>
+            <span>🌟</span>
+            <span>{watchedMovie.userRating}</span>
+          </p>
+          <p>
+            <span>⏳</span>
+            <span>{watchedMovie.runtime}</span>
+          </p>
+          <button
+            className="btn-delete"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClickBtnDelete(watchedMovie.id)
+            }
+            }
+          >
+            X
+          </button>
+        </div>
+      </li>
+    ))
+  )
 }
 
 const App = () => {
@@ -212,42 +250,15 @@ const App = () => {
             </div>
           ) : (
             <>
-              <History watchedMovies={watchedMovies}/>
+              <History watchedMovies={watchedMovies} />
               <ul className="list list-movies">
                 {watchedMovies.length > 0 &&
-                  watchedMovies.map((watchedMovie) => (
-                    <li key={watchedMovie.id} onClick={() => handleClickMovie(watchedMovie)}>
-                      <img
-                        src={watchedMovie.poster}
-                        alt={`Poster de ${watchedMovie.title}`}
-                      />
-                      <h3>{watchedMovie.title}</h3>
-                      <div>
-                        <p>
-                          <span>⭐</span>
-                          <span>{watchedMovie.imdbRating}</span>
-                        </p>
-                        <p>
-                          <span>🌟</span>
-                          <span>{watchedMovie.userRating}</span>
-                        </p>
-                        <p>
-                          <span>⏳</span>
-                          <span>{watchedMovie.runtime}</span>
-                        </p>
-                        <button
-                          className="btn-delete"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleClickBtnDelete(watchedMovie.id)
-                          }
-                          }
-                        >
-                          X
-                        </button>
-                      </div>
-                    </li>
-                  ))}
+                  <WatchedMovies
+                    watchedMovies={watchedMovies}
+                    onClickBtnDelete={handleClickBtnDelete}
+                    onClickMovie={handleClickMovie}
+                  />
+                }
               </ul>
             </>
           )}
