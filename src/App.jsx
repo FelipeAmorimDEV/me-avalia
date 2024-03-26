@@ -1,4 +1,32 @@
+import { useEffect, useState } from 'react'
+
 function App() {
+  const [movies, setMovies] = useState([])
+
+  useEffect(() => {
+    fetch(
+      'https://raw.githubusercontent.com/FelipeAmorimDEV/fake-data/main/fake-movies.json',
+    )
+      .then((r) => r.json())
+      .then((data) =>
+        setMovies(
+          data.map((movie) => ({
+            id: movie.imdbID,
+            title: movie.Title,
+            year: movie.Year,
+            released: movie.Released,
+            runtime: movie.Runtime,
+            genre: movie.Genre,
+            director: movie.Director,
+            actors: movie.Actors,
+            plot: movie.Plot,
+            poster: movie.Poster,
+            imdbRating: movie.imdbRating,
+          })),
+        ),
+      )
+  }, [])
+
   return (
     <>
       <nav className="nav-bar">
@@ -15,50 +43,28 @@ function App() {
           </button>
         </form>
         <p className="num-results">
-          <strong>5</strong> Resultados
+          <strong>{movies.length}</strong> Resultados
         </p>
       </nav>
 
       <main className="main">
         <div className="box">
           <ul className="list list-movies">
-            <li>
-              <img
-                src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                alt="Poster de The Matrix"
-              />
-              <h3>The Matrix</h3>
-              <p>
-                <span>📅</span>
-                <span>1999</span>
-              </p>
-            </li>
-            <li>
-              <img
-                src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                alt="Poster de The Matrix"
-              />
-              <h3>The Matrix</h3>
-              <p>
-                <span>📅</span>
-                <span>1999</span>
-              </p>
-            </li>
-            <li>
-              <img
-                src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                alt="Poster de The Matrix"
-              />
-              <h3>The Matrix</h3>
-              <p>
-                <span>📅</span>
-                <span>1999</span>
-              </p>
-            </li>
+            {movies.length > 0 &&
+              movies.map((movie) => (
+                <li key={movie.id}>
+                  <img src={movie.poster} alt={`Poster de ${movie.title}`} />
+                  <h3>{movie.title}</h3>
+                  <p>
+                    <span>📅</span>
+                    <span>{movie.year}</span>
+                  </p>
+                </li>
+              ))}
           </ul>
         </div>
         <div className="box">
-          {/* <div className="history">
+          <div className="history">
             <h2>Histórico</h2>
             <div>
               <p>
@@ -92,8 +98,8 @@ function App() {
                 <button className="btn-delete">X</button>
               </div>
             </li>
-          </ul> */}
-          <div className="details">
+          </ul>
+          {/* <div className="details">
             <header>
               <button className="btn-back">&larr;</button>
               <img
@@ -136,7 +142,7 @@ function App() {
               <p>Elenco: Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss</p>
               <p>Direção: Lana Wachowski, Lilly Wachowski</p>
             </section>
-          </div>
+          </div> */}
         </div>
       </main>
     </>
