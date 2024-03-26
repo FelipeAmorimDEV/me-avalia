@@ -45,6 +45,9 @@ function App() {
     setSelectedMovie(null)
   }
 
+  const handleClickBtnDeleteMovie = (movieId) =>
+    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
+
   return (
     <>
       <nav className="nav-bar">
@@ -165,7 +168,14 @@ function App() {
                           <span>⏳</span>
                           <span>{watchedMovie.runtime}</span>
                         </p>
-                        <button className="btn-delete">X</button>
+                        <button
+                          className="btn-delete"
+                          onClick={() =>
+                            handleClickBtnDeleteMovie(watchedMovie.id)
+                          }
+                        >
+                          X
+                        </button>
                       </div>
                     </li>
                   ))}
