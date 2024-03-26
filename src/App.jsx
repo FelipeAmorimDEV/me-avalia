@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 function App() {
   const [movies, setMovies] = useState([])
   const [selectedMovie, setSelectedMovie] = useState(null)
+  const [watchedMovies, setWatchedMovies] = useState([])
 
   useEffect(() => {
     fetch(
@@ -30,8 +31,19 @@ function App() {
 
   const handleClickBtnMovie = (movie) =>
     setSelectedMovie((sm) => (sm?.id === movie.id ? null : movie))
-
   const handleClickBtnBack = () => setSelectedMovie(null)
+
+  const handleSubmitMovieRating = (e) => {
+    e.preventDefault()
+
+    const { rating } = e.target.elements
+
+    setWatchedMovies((wm) => [
+      ...wm,
+      { ...selectedMovie, userRating: +rating.value },
+    ])
+    setSelectedMovie(null)
+  }
 
   return (
     <>
@@ -94,7 +106,10 @@ function App() {
               </header>
               <section>
                 <div className="rating">
-                  <form className="form-rating">
+                  <form
+                    className="form-rating"
+                    onSubmit={handleSubmitMovieRating}
+                  >
                     <p>Qual nota você dá para este filme?</p>
                     <div>
                       <select name="rating" defaultValue={1}>
