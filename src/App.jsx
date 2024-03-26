@@ -1,15 +1,22 @@
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 
 function App() {
   const [movies, setMovies] = useState([])
   const [selectedMovie, setSelectedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
+  
 
   const apiKey = import.meta.env.VITE_API_KEY
 
   const handleClickBtnMovie = (movie) => {
     if (selectedMovie?.id === movie.id) {
       return setSelectedMovie(null)
+    }
+
+    const watchedMovie = watchedMovies.find((m) => m.id === movie.id)
+    
+    if (watchedMovie) {
+      return setSelectedMovie(watchedMovie)
     }
 
     fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
@@ -26,7 +33,7 @@ function App() {
           actors: data.Actors,
           poster: data.Poster,
           imdbRating: data.imdbRating,
-          plot: data.Plot,
+          plot: data.Plot
         }
     ))
       .catch(console.log)
@@ -44,6 +51,7 @@ function App() {
   }
   const handleClickBtnDeleteMovie = (movieId) =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
+
   const handleSearchMovie = (e) => {
     e.preventDefault()
     const { searchMovie } = e.target.elements
@@ -142,7 +150,7 @@ function App() {
                           </option>
                         ))}
                       </select>
-                      <button className="btn-add">+ Adicionar á lista</button>
+                      <button className="btn-add">{selectedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
                     </div>
                   </form>
                 </div>
@@ -169,7 +177,7 @@ function App() {
               <ul className="list list-movies">
                 {watchedMovies.length > 0 &&
                   watchedMovies.map((watchedMovie) => (
-                    <li key={watchedMovie.id}>
+                    <li key={watchedMovie.id} onClick={() => handleClickBtnMovie(watchedMovie)}>
                       <img
                         src={watchedMovie.poster}
                         alt={`Poster de ${watchedMovie.title}`}
@@ -190,8 +198,10 @@ function App() {
                         </p>
                         <button
                           className="btn-delete"
-                          onClick={() =>
+                          onClick={(e) =>{
+                            e.stopPropagation()
                             handleClickBtnDeleteMovie(watchedMovie.id)
+                          }
                           }
                         >
                           X
