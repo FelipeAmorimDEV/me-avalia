@@ -85,6 +85,58 @@ const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
   )
 }
 
+const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) => {
+  return (
+    <div className="details">
+      <header>
+        <button className="btn-back" onClick={onClickBtnBack}>
+          &larr;
+        </button>
+        <img
+          src={clickedMovie.poster}
+          alt={`Poster de ${clickedMovie.title}`}
+        />
+        <div className="details-overview">
+          <h2>{clickedMovie.title}</h2>
+          <p>
+            {clickedMovie.released} &bull; {clickedMovie.runtime}
+          </p>
+          <p>{clickedMovie.genre}</p>
+          <p>
+            <span>⭐</span>
+            {clickedMovie.imdbRating} IMDb rating
+          </p>
+        </div>
+      </header>
+      <section>
+        <div className="rating">
+          <form
+            className="form-rating"
+            onSubmit={onSubmitWatchedMovie}
+          >
+            <p>Qual nota você dá para este filme?</p>
+            <div>
+              <select name="rating" defaultValue={clickedMovie.userRating ?? 0} key={crypto.randomUUID()}>
+                {Array.from({ length: 10 }, (_, i) => (
+                  <option key={i} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+              <button className="btn-add">{clickedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
+            </div>
+          </form>
+        </div>
+        <p>
+          <em>{clickedMovie.plot}</em>
+        </p>
+        <p>Elenco: {clickedMovie.actors}</p>
+        <p>Direção: {clickedMovie.director}</p>
+      </section>
+    </div>
+  )
+}
+
 const App = () => {
   const [movies, setMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
@@ -181,7 +233,6 @@ const App = () => {
 
   return (
     <>
-
       <NavBar movies={movies} onSearchMovie={handleSearchMovie} />
       <main className="main">
         <ListBox>
@@ -201,53 +252,11 @@ const App = () => {
         </ListBox>
         <ListBox>
           {clickedMovie ? (
-            <div className="details">
-              <header>
-                <button className="btn-back" onClick={handleClickBtnBack}>
-                  &larr;
-                </button>
-                <img
-                  src={clickedMovie.poster}
-                  alt={`Poster de ${clickedMovie.title}`}
-                />
-                <div className="details-overview">
-                  <h2>{clickedMovie.title}</h2>
-                  <p>
-                    {clickedMovie.released} &bull; {clickedMovie.runtime}
-                  </p>
-                  <p>{clickedMovie.genre}</p>
-                  <p>
-                    <span>⭐</span>
-                    {clickedMovie.imdbRating} IMDb rating
-                  </p>
-                </div>
-              </header>
-              <section>
-                <div className="rating">
-                  <form
-                    className="form-rating"
-                    onSubmit={handleSubmitWatchedMovie}
-                  >
-                    <p>Qual nota você dá para este filme?</p>
-                    <div>
-                      <select name="rating" defaultValue={clickedMovie.userRating ?? 0} key={crypto.randomUUID()}>
-                        {Array.from({ length: 10 }, (_, i) => (
-                          <option key={i} value={i + 1}>
-                            {i + 1}
-                          </option>
-                        ))}
-                      </select>
-                      <button className="btn-add">{clickedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
-                    </div>
-                  </form>
-                </div>
-                <p>
-                  <em>{clickedMovie.plot}</em>
-                </p>
-                <p>Elenco: {clickedMovie.actors}</p>
-                <p>Direção: {clickedMovie.director}</p>
-              </section>
-            </div>
+            <MovieDetails
+              clickedMovie={clickedMovie}
+              onClickBtnBack={handleClickBtnBack}
+              onSubmitWatchedMovie={handleSubmitWatchedMovie}
+            />
           ) : (
             <>
               <History watchedMovies={watchedMovies} />
