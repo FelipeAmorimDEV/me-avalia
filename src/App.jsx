@@ -43,6 +43,19 @@ function App() {
   const handleSubmitMovieRating = (e) => {
     e.preventDefault()
     const { rating } = e.target.elements
+
+    const isMovieInWatchedList = watchedMovies.some((movie) => selectedMovie.id === movie.id) 
+    
+    if (isMovieInWatchedList) {
+      setWatchedMovies((wm) => wm.map((movie) => movie.id === selectedMovie.id 
+        ? {...movie, userRating: +rating.value} 
+        : movie
+      ))
+      setSelectedMovie(null)
+
+      return
+    }
+
     setWatchedMovies((wm) => [
       ...wm,
       { ...selectedMovie, userRating: +rating.value },
