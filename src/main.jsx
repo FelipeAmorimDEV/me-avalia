@@ -8,7 +8,5 @@ const element = document.querySelector('[data-js="root"]')
 const app = ReactDOM.createRoot(element)
 
 app.render(
-  <React.StrictMode>
     <App />
-  </React.StrictMode>,
 )
