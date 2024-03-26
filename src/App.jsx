@@ -144,28 +144,31 @@ function App() {
                 </div>
               </div>
               <ul className="list list-movies">
-                <li>
-                  <img
-                    src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
-                    alt="Poster de The Matrix"
-                  />
-                  <h3>The Matrix</h3>
-                  <div>
-                    <p>
-                      <span>⭐</span>
-                      <span>8.7</span>
-                    </p>
-                    <p>
-                      <span>🌟</span>
-                      <span>9.5</span>
-                    </p>
-                    <p>
-                      <span>⏳</span>
-                      <span>136 min</span>
-                    </p>
-                    <button className="btn-delete">X</button>
-                  </div>
-                </li>
+                {watchedMovies.length > 0 &&
+                  watchedMovies.map((watchedMovie) => (
+                    <li key={watchedMovie.id}>
+                      <img
+                        src={watchedMovie.poster}
+                        alt={`Poster de ${watchedMovie.title}`}
+                      />
+                      <h3>{watchedMovie.title}</h3>
+                      <div>
+                        <p>
+                          <span>⭐</span>
+                          <span>{watchedMovie.imdbRating}</span>
+                        </p>
+                        <p>
+                          <span>🌟</span>
+                          <span>{watchedMovie.userRating}</span>
+                        </p>
+                        <p>
+                          <span>⏳</span>
+                          <span>{watchedMovie.runtime}</span>
+                        </p>
+                        <button className="btn-delete">X</button>
+                      </div>
+                    </li>
+                  ))}
               </ul>
             </>
           )}
