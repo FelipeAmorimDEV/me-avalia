@@ -31,6 +31,22 @@ const ListBox = ({ children }) => {
   return <ul className='box'>{children}</ul>
 }
 
+const History = ({ watchedMovies }) => {
+  return (
+    <div className="history">
+      <h2>Histórico</h2>
+      <div>
+        <p>
+          <span>#️⃣</span> <span>{watchedMovies.length} filmes</span>
+        </p>
+        <p>
+          <span>⏳</span> <span>{getTotalMinutes(watchedMovies)} min</span>
+        </p>
+      </div>
+    </div>
+    )
+}
+
 const App = () => {
   const [movies, setMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
@@ -196,17 +212,7 @@ const App = () => {
             </div>
           ) : (
             <>
-              <div className="history">
-                <h2>Histórico</h2>
-                <div>
-                  <p>
-                    <span>#️⃣</span> <span>{watchedMovies.length} filmes</span>
-                  </p>
-                  <p>
-                    <span>⏳</span> <span>{getTotalMinutes(watchedMovies)} min</span>
-                  </p>
-                </div>
-              </div>
+              <History watchedMovies={watchedMovies}/>
               <ul className="list list-movies">
                 {watchedMovies.length > 0 &&
                   watchedMovies.map((watchedMovie) => (
