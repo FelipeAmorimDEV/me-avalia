@@ -1,4 +1,7 @@
-import {  useState } from 'react'
+import { useState } from 'react'
+
+const getTotalMinutes = watchedMovies => watchedMovies
+  .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]),0)
 
 function App() {
   const [movies, setMovies] = useState([])
@@ -10,17 +13,20 @@ function App() {
 
   const handleClickMovie = currentClickedMovie => {
     const prevClickedMovie = clickedMovie
-    if (clickedMovie?.id === movie.id) {
-      return setClickedMovie(null)
+    if (prevClickedMovie?.id === currentClickedMovie.id) {
+      setClickedMovie(null)
+      return
     }
 
-    const watchedMovie = watchedMovies.find((m) => m.id === movie.id)
+    const watchedMovie = watchedMovies
+      .find((watchedMovie) => watchedMovie.id === currentClickedMovie.id)
     
     if (watchedMovie) {
-      return setClickedMovie(watchedMovie)
+      setClickedMovie(watchedMovie)
+      return 
     }
 
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
       .then(r => r.json())
       .then(data => setClickedMovie(
         {
@@ -39,34 +45,27 @@ function App() {
     ))
       .catch(console.log)
   }
-    
-  const handleClickBtnBack = () => setClickedMovie(null)
-  const handleSubmitMovieRating = (e) => {
+
+  const handleSubmitWatchedMovie = e => {
     e.preventDefault()
     const { rating } = e.target.elements
 
-    const isMovieInWatchedList = watchedMovies.some((movie) => clickedMovie.id === movie.id) 
+    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id) 
     
     if (isMovieInWatchedList) {
-      setWatchedMovies((wm) => wm.map((movie) => movie.id === clickedMovie.id 
-        ? {...movie, userRating: +rating.value} 
-        : movie
+      setWatchedMovies(wm => wm.map(movie => 
+        movie.id === clickedMovie.id ? {...movie, userRating: +rating.value} : movie
       ))
       setClickedMovie(null)
 
       return
     }
 
-    setWatchedMovies((wm) => [
-      ...wm,
-      { ...clickedMovie, userRating: +rating.value },
-    ])
+    setWatchedMovies((wm) => [...wm, { ...clickedMovie, userRating: +rating.value }])
     setClickedMovie(null)
   }
-  const handleClickBtnDeleteMovie = (movieId) =>
-    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
 
-  const handleSearchMovie = (e) => {
+  const handleSearchMovie = e => {
     e.preventDefault()
     const { searchMovie } = e.target.elements
 
@@ -85,9 +84,9 @@ function App() {
       .catch(console.log)
   }
 
-  // eslint-disable-next-line
-  const watchedMoviesRuntime = watchedMovies
-    .reduce((acc, movie) => (acc += +movie?.runtime.replace(' min', '')),0)
+  const handleClickBtnBack = () => setClickedMovie(null)
+  const handleClickBtnDelete = movieId => 
+    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
 
   return (
     <>
@@ -153,7 +152,7 @@ function App() {
                 <div className="rating">
                   <form
                     className="form-rating"
-                    onSubmit={handleSubmitMovieRating}
+                    onSubmit={handleSubmitWatchedMovie}
                   >
                     <p>Qual nota você dá para este filme?</p>
                     <div>
@@ -184,7 +183,7 @@ function App() {
                     <span>#️⃣</span> <span>{watchedMovies.length} filmes</span>
                   </p>
                   <p>
-                    <span>⏳</span> <span>{watchedMoviesRuntime} min</span>
+                    <span>⏳</span> <span>{getTotalMinutes(watchedMovies)} min</span>
                   </p>
                 </div>
               </div>
@@ -212,9 +211,9 @@ function App() {
                         </p>
                         <button
                           className="btn-delete"
-                          onClick={(e) =>{
+                          onClick={(e) => {
                             e.stopPropagation()
-                            handleClickBtnDeleteMovie(watchedMovie.id)
+                            handleClickBtnDelete(watchedMovie.id)
                           }
                           }
                         >
