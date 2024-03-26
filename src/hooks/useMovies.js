@@ -8,7 +8,7 @@ const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
 
   useEffect(() => {
-    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
       .then((r) => r.json())
       .then((data) => setMovies(data.Search.map((movie) => ({
         id: movie.imdbID,
@@ -81,7 +81,7 @@ const useMovies = () => {
       return
     }
 
-    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
       .then((r) => r.json())
       .then((data) => setMovies(data.Search.map((movie) => ({
         id: movie.imdbID,
