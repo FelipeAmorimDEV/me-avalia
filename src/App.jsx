@@ -19,7 +19,7 @@ function App() {
       return setSelectedMovie(watchedMovie)
     }
 
-    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.id}`)
       .then(r => r.json())
       .then(data => setSelectedMovie(
         {
@@ -69,7 +69,7 @@ function App() {
     e.preventDefault()
     const { searchMovie } = e.target.elements
 
-    if (searchMovie.length < 2) {
+    if (searchMovie.value.length < 2) {
       return
     }
 
