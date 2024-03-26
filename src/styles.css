@@ -52,20 +52,6 @@ body {
   position: relative;
 }
 
-.loader {
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 4.8rem;
-}
-
-.error {
-  text-align: center;
-  font-size: 2rem;
-  padding: 4.8rem;
-}
-
 .logo {
   width: 214px;
 }
@@ -96,10 +82,22 @@ body {
   font-size: 1.8rem;
 }
 
-.form-search {
+.form-search  {
   display: flex;
   gap: 5px;
 }
+
+.form-rating > div {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+.form-rating > div select {
+  padding: 0 1rem;
+}
+.form-rating > div button {
+  flex: 1
+} 
 
 .btn-search {
   background-color: #FF6086;
@@ -114,30 +112,10 @@ body {
   cursor: pointer;
 }
 
-.btn-toggle {
-  position: absolute;
-  top: 0.8rem;
-  right: 0.8rem;
-  height: 2.4rem;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: none;
-  background-color: var(--color-background-900);
-  color: var(--color-text);
-  font-size: 1.4rem;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 999;
-}
-
 .list {
   list-style: none;
   padding: 0.8rem 0;
   overflow: scroll;
-}
-
-.list-watched {
-  height: calc(100% - 9rem);
 }
 
 .list li {
@@ -202,20 +180,20 @@ body {
   background-color: var(--color-red-dark);
 }
 
-.summary {
+.history {
   padding: 2.2rem 3.2rem 1.8rem 3.2rem;
   border-radius: 0.9rem;
   background-color: var(--color-background-100);
   box-shadow: 0 1.2rem 2.4rem rgba(0, 0, 0, 0.2);
 }
 
-.summary h2 {
+.history h2 {
   text-transform: uppercase;
   font-size: 1.6rem;
   margin-bottom: 0.6rem;
 }
 
-.summary div {
+.history div {
   display: flex;
   align-items: center;
   gap: 2.4rem;
@@ -223,7 +201,7 @@ body {
   font-weight: 600;
 }
 
-.summary p {
+.history p {
   gap: 0.8rem;
 }
 
@@ -295,16 +273,6 @@ body {
   background-color: var(--color-primary-light);
 }
 
-.seconds {
-  background-color: var(--color-background-100);
-  width: 8rem;
-  border-radius: 10rem;
-  font-weight: 600;
-  text-align: center;
-  padding: 0.4rem;
-  margin-top: 2.4rem;
-}
-
 .btn-back {
   position: absolute;
   top: 0.6rem;
@@ -314,7 +282,7 @@ body {
   border-radius: 50%;
   border: none;
   background-color: #fff;
-  color: var(--color-background-500);
+  color: var(--color-text);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
   font-family: sans-serif;
   font-size: 2.4rem;
@@ -330,4 +298,12 @@ body {
 .list::-webkit-scrollbar {
   display: none;
   scroll-behavior: smooth;
+}
+
+.loader {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 4.8rem;
 }
