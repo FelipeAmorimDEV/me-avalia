@@ -57,16 +57,13 @@ const useMovies = apiKey => {
       .catch(console.log)
   }
   
-  const handleSubmitWatchedMovie = e => {
-    e.preventDefault()
-    const { rating } = e.target.elements
-
+  const handleSubmitWatchedMovie = rating => {
     setWatchedMovies((wm) => {
       const isMovieAlreadyWatched = wm.some((movie) => movie.id === clickedMovie.id)
       return isMovieAlreadyWatched 
       ? wm
-        .map((movie) => movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie)
-      : [...wm, { ...clickedMovie, userRating: +rating.value }]
+        .map((movie) => movie.id === clickedMovie.id ? { ...movie, userRating: rating } : movie)
+      : [...wm, { ...clickedMovie, userRating: rating }]
     })
     setClickedMovie(null)
   }

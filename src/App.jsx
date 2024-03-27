@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 
 import { useMovies } from "./hooks/use-movies"
+import { StarRating } from "./components/stars-rating"
 
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
@@ -12,7 +13,7 @@ const NavBar = ({ onSearchMovie, movies, detailsMovieRef }) => {
   const formRef = useRef(null)
 
   useEffect(() => {
-    if(formRef.current.elements.searchMovie.value.length > 0) {
+    if (formRef.current.elements.searchMovie.value.length > 0) {
       formRef.current.reset()
       detailsMovieRef.current(null)
     }
@@ -95,7 +96,12 @@ const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
   )
 }
 
-const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) => {
+const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie, watchedMovies }) => {
+  const userRating = watchedMovies.find((m) => m.id === clickedMovie.id)?.userRating
+  const [rating, setRating] = useState(userRating ?? 0)
+
+  const handleRating = rating => setRating(rating) 
+
   return (
     <div className="details">
       <header>
@@ -120,22 +126,10 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
       </header>
       <section>
         <div className="rating">
-          <form
-            className="form-rating"
-            onSubmit={onSubmitWatchedMovie}
-          >
-            <p>Qual nota você dá para este filme?</p>
-            <div>
-              <select name="rating" defaultValue={clickedMovie.userRating ?? 0} key={crypto.randomUUID()}>
-                {Array.from({ length: 10 }, (_, i) => (
-                  <option key={i} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-              <button className="btn-add">{clickedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
-            </div>
-          </form>
+          <StarRating maxRating={10} initialRating={rating} color="#FCC419" size={26} onRating={handleRating}/>
+          <button className="btn-add" onClick={() => onSubmitWatchedMovie(rating)}>
+            {userRating > 0 ? "Alterar nota" : "+ Adicionar á lista"}
+          </button>
         </div>
         <p><em>{clickedMovie.plot}</em></p>
         <p>Elenco: {clickedMovie.actors}</p>
@@ -160,23 +154,23 @@ const Movies = ({ movies, onClickMovie }) => {
 }
 
 const Main = ({ movies, detailsMovieRef }) => {
-  const { 
-    clickedMovie, 
-    watchedMovies, 
-    handleClickMovie, 
-    handleSubmitWatchedMovie, 
-    handleClickBtnBack, 
+  const {
+    clickedMovie,
+    watchedMovies,
+    handleClickMovie,
+    handleSubmitWatchedMovie,
+    handleClickBtnBack,
     handleClickBtnDelete,
     setClickedMovie
   } = useMovies(apiKey)
 
   detailsMovieRef.current = setClickedMovie
- 
+
   return (
     <main className="main">
       <ListBox>
         <ul className="list list-movies">
-          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie}/> }
+          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie} />}
         </ul>
       </ListBox>
       <ListBox>
@@ -185,6 +179,7 @@ const Main = ({ movies, detailsMovieRef }) => {
             clickedMovie={clickedMovie}
             onClickBtnBack={handleClickBtnBack}
             onSubmitWatchedMovie={handleSubmitWatchedMovie}
+            watchedMovies={watchedMovies}
           />
         ) : (
           <>
@@ -213,8 +208,8 @@ const App = () => {
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
       .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => 
-        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster}))))
+      .then((data) => setMovies(data.Search.map((movie) =>
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
       .catch(console.log)
   }, [])
 
@@ -228,15 +223,15 @@ const App = () => {
 
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
       .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => 
-        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster}))))
+      .then((data) => setMovies(data.Search.map((movie) =>
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
       .catch(console.log)
   }
 
   return (
     <>
-      <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef}/>
-      <Main movies={movies} detailsMovieRef={detailsMovieRef}/>
+      <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef} />
+      <Main movies={movies} detailsMovieRef={detailsMovieRef} />
     </>
   )
 }
