@@ -137,6 +137,20 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
   )
 }
 
+const Movies = ({ movies, onClickMovie }) => {
+  return (
+    movies.map((movie) => (
+      <li key={movie.id} onClick={() => onClickMovie(movie)}>
+        <img src={movie.poster} alt={`Poster de ${movie.title}`} />
+        <h3>{movie.title}</h3>
+        <p>
+          <span>📅</span>
+          <span>{movie.year}</span>
+        </p>
+      </li>
+    )))
+}
+
 const Main = ({ movies }) => {
   const [clickedMovie, setClickedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
@@ -202,17 +216,7 @@ const Main = ({ movies }) => {
     <main className="main">
       <ListBox>
         <ul className="list list-movies">
-          {movies.length > 0 &&
-            movies.map((movie) => (
-              <li key={movie.id} onClick={() => handleClickMovie(movie)}>
-                <img src={movie.poster} alt={`Poster de ${movie.title}`} />
-                <h3>{movie.title}</h3>
-                <p>
-                  <span>📅</span>
-                  <span>{movie.year}</span>
-                </p>
-              </li>
-            ))}
+          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie}/> }
         </ul>
       </ListBox>
       <ListBox>
@@ -243,7 +247,7 @@ const Main = ({ movies }) => {
 
 const App = () => {
   const [movies, setMovies] = useState([])
-  
+
 
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
@@ -257,7 +261,7 @@ const App = () => {
       .catch(console.log)
   }, [])
 
-  
+
 
   const handleSearchMovie = e => {
     e.preventDefault()
@@ -281,7 +285,7 @@ const App = () => {
   return (
     <>
       <NavBar movies={movies} onSearchMovie={handleSearchMovie} />
-      <Main movies={movies}/>
+      <Main movies={movies} />
     </>
   )
 }
