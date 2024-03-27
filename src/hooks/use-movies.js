@@ -82,7 +82,8 @@ const useMovies = apiKey => {
     handleClickMovie, 
     handleSubmitWatchedMovie, 
     handleClickBtnBack, 
-    handleClickBtnDelete 
+    handleClickBtnDelete,
+    setClickedMovie
   }
 }
 

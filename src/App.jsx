@@ -8,15 +8,15 @@ const getMoviePoster = moviePoster => moviePoster === "N/A" ? "404-img.jpg" : mo
 
 const apiKey = import.meta.env.VITE_API_KEY
 
-const NavBar = ({ onSearchMovie, movies }) => {
+const NavBar = ({ onSearchMovie, movies, detailsMovieRef }) => {
   const formRef = useRef(null)
 
   useEffect(() => {
-    console.log(formRef)
     if(movies.length > 0) {
       formRef.current.reset()
+      detailsMovieRef.current(null)
     }
-  }, [movies])
+  }, [movies, detailsMovieRef])
 
   return (
     <nav className="nav-bar">
@@ -159,15 +159,18 @@ const Movies = ({ movies, onClickMovie }) => {
     )))
 }
 
-const Main = ({ movies }) => {
+const Main = ({ movies, detailsMovieRef }) => {
   const { 
     clickedMovie, 
     watchedMovies, 
     handleClickMovie, 
     handleSubmitWatchedMovie, 
     handleClickBtnBack, 
-    handleClickBtnDelete
+    handleClickBtnDelete,
+    setClickedMovie
   } = useMovies(apiKey)
+
+  detailsMovieRef.current = setClickedMovie
  
   return (
     <main className="main">
@@ -205,6 +208,8 @@ const Main = ({ movies }) => {
 const App = () => {
   const [movies, setMovies] = useState([])
 
+  const detailsMovieRef = useRef(null)
+
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
       .then((r) => r.json())
@@ -230,8 +235,8 @@ const App = () => {
 
   return (
     <>
-      <NavBar movies={movies} onSearchMovie={handleSearchMovie} />
-      <Main movies={movies} />
+      <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef}/>
+      <Main movies={movies} detailsMovieRef={detailsMovieRef}/>
     </>
   )
 }
