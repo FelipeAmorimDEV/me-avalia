@@ -1,9 +1,24 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import localforage from "localforage"
 
 const useMovies = apiKey => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
 
+  useEffect(() => {
+    localforage.setItem("meAvalia", watchedMovies)
+      .catch(error => alert(error.message))
+  }, [watchedMovies])
+
+  useEffect(() => {
+    localforage.getItem("meAvalia")
+      .then(value => {
+        if (value) {
+          setWatchedMovies(value)
+        }
+      })
+      .catch(error => alert(error.message))
+  }, [])
   const handleClickBtnBack = () => setClickedMovie(null)
   const handleClickBtnDelete = movieId =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
