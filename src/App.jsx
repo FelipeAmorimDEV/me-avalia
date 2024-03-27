@@ -1,13 +1,28 @@
-import { useMovies } from './hooks/useMovies'
+import { useState, useEffect, useRef } from "react"
+
+import { useMovies } from "./hooks/use-movies"
+import { StarRating } from "./components/stars-rating"
 
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
+const getMoviePoster = moviePoster => moviePoster === "N/A" ? "404-img.jpg" : moviePoster
 
-const NavBar = ({ onSearchMovie, movies }) => {
+const apiKey = import.meta.env.VITE_API_KEY
+
+const NavBar = ({ onSearchMovie, movies, detailsMovieRef }) => {
+  const formRef = useRef(null)
+
+  useEffect(() => {
+    if (formRef.current.elements.searchMovie.value.length > 0) {
+      formRef.current.reset()
+      detailsMovieRef.current(null)
+    }
+  }, [movies, detailsMovieRef])
+
   return (
     <nav className="nav-bar">
       <img src="logo-me-avalia.png" alt="Logo me avalia" className="logo" />
-      <form className="form-search" onSubmit={onSearchMovie}>
+      <form ref={formRef} className="form-search" onSubmit={onSearchMovie}>
         <input
           type="text"
           name="searchMovie"
@@ -25,9 +40,7 @@ const NavBar = ({ onSearchMovie, movies }) => {
     </nav>)
 }
 
-const ListBox = ({ children }) => {
-  return <ul className='box'>{children}</ul>
-}
+const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 
 const History = ({ watchedMovies }) => {
   return (
@@ -50,7 +63,7 @@ const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
     watchedMovies.map((watchedMovie) => (
       <li key={watchedMovie.id} onClick={() => onClickMovie(watchedMovie)}>
         <img
-          src={watchedMovie.poster}
+          src={getMoviePoster(watchedMovie.poster)}
           alt={`Poster de ${watchedMovie.title}`}
         />
         <h3>{watchedMovie.title}</h3>
@@ -83,7 +96,12 @@ const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
   )
 }
 
-const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) => {
+const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie, watchedMovies }) => {
+  const userRating = watchedMovies.find((m) => m.id === clickedMovie.id)?.userRating
+  const [rating, setRating] = useState(userRating ?? 0)
+
+  const handleRating = rating => setRating(rating) 
+
   return (
     <div className="details">
       <header>
@@ -91,7 +109,7 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
           &larr;
         </button>
         <img
-          src={clickedMovie.poster}
+          src={getMoviePoster(clickedMovie.poster)}
           alt={`Poster de ${clickedMovie.title}`}
         />
         <div className="details-overview">
@@ -108,26 +126,12 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
       </header>
       <section>
         <div className="rating">
-          <form
-            className="form-rating"
-            onSubmit={onSubmitWatchedMovie}
-          >
-            <p>Qual nota você dá para este filme?</p>
-            <div>
-              <select name="rating" defaultValue={clickedMovie.userRating ?? 0} key={crypto.randomUUID()}>
-                {Array.from({ length: 10 }, (_, i) => (
-                  <option key={i} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-              <button className="btn-add">{clickedMovie?.userRating ? "Alterar nota" : "+ Adicionar á lista"}</button>
-            </div>
-          </form>
+          <StarRating maxRating={10} initialRating={rating} color="#FCC419" size={26} onRating={handleRating}/>
+          <button className="btn-add" onClick={() => onSubmitWatchedMovie(rating)}>
+            {userRating > 0 ? "Alterar nota" : "+ Adicionar á lista"}
+          </button>
         </div>
-        <p>
-          <em>{clickedMovie.plot}</em>
-        </p>
+        <p><em>{clickedMovie.plot}</em></p>
         <p>Elenco: {clickedMovie.actors}</p>
         <p>Direção: {clickedMovie.director}</p>
       </section>
@@ -135,60 +139,99 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
   )
 }
 
-const App = () => {
+const Movies = ({ movies, onClickMovie }) => {
+  return (
+    movies.map((movie) => (
+      <li key={movie.id} onClick={() => onClickMovie(movie)}>
+        <img src={getMoviePoster(movie.poster)} alt={`Poster de ${movie.title}`} />
+        <h3>{movie.title}</h3>
+        <p>
+          <span>📅</span>
+          <span>{movie.year}</span>
+        </p>
+      </li>
+    )))
+}
+
+const Main = ({ movies, detailsMovieRef }) => {
   const {
-    movies, 
-    clickedMovie, 
-    watchedMovies, 
-    handleSearchMovie, 
-    handleClickMovie, 
-    handleSubmitWatchedMovie, 
-    handleClickBtnBack, 
-    handleClickBtnDelete 
-  } = useMovies()
+    clickedMovie,
+    watchedMovies,
+    handleClickMovie,
+    handleSubmitWatchedMovie,
+    handleClickBtnBack,
+    handleClickBtnDelete,
+    setClickedMovie
+  } = useMovies(apiKey)
+
+  detailsMovieRef.current = setClickedMovie
+
+  return (
+    <main className="main">
+      <ListBox>
+        <ul className="list list-movies">
+          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie} />}
+        </ul>
+      </ListBox>
+      <ListBox>
+        {clickedMovie ? (
+          <MovieDetails
+            clickedMovie={clickedMovie}
+            onClickBtnBack={handleClickBtnBack}
+            onSubmitWatchedMovie={handleSubmitWatchedMovie}
+            watchedMovies={watchedMovies}
+          />
+        ) : (
+          <>
+            <History watchedMovies={watchedMovies} />
+            <ul className="list list-movies">
+              {watchedMovies.length > 0 &&
+                <WatchedMovies
+                  watchedMovies={watchedMovies}
+                  onClickBtnDelete={handleClickBtnDelete}
+                  onClickMovie={handleClickMovie}
+                />
+              }
+            </ul>
+          </>
+        )}
+      </ListBox>
+    </main>
+  )
+}
+
+const App = () => {
+  const [movies, setMovies] = useState([])
+
+  const detailsMovieRef = useRef(null)
+
+  useEffect(() => {
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) =>
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
+      .catch(console.log)
+  }, [])
+
+  const handleSearchMovie = e => {
+    e.preventDefault()
+    const { searchMovie } = e.target.elements
+
+    if (searchMovie.value.length < 2) {
+      return
+    }
+
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) =>
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
+      .catch(console.log)
+  }
 
   return (
     <>
-      <NavBar movies={movies} onSearchMovie={handleSearchMovie} />
-      <main className="main">
-        <ListBox>
-          <ul className="list list-movies">
-            {movies.length > 0 &&
-              movies.map((movie) => (
-                <li key={movie.id} onClick={() => handleClickMovie(movie)}>
-                  <img src={movie.poster} alt={`Poster de ${movie.title}`} />
-                  <h3>{movie.title}</h3>
-                  <p>
-                    <span>📅</span>
-                    <span>{movie.year}</span>
-                  </p>
-                </li>
-              ))}
-          </ul>
-        </ListBox>
-        <ListBox>
-          {clickedMovie ? (
-            <MovieDetails
-              clickedMovie={clickedMovie}
-              onClickBtnBack={handleClickBtnBack}
-              onSubmitWatchedMovie={handleSubmitWatchedMovie}
-            />
-          ) : (
-            <>
-              <History watchedMovies={watchedMovies} />
-              <ul className="list list-movies">
-                {watchedMovies.length > 0 &&
-                  <WatchedMovies
-                    watchedMovies={watchedMovies}
-                    onClickBtnDelete={handleClickBtnDelete}
-                    onClickMovie={handleClickMovie}
-                  />
-                }
-              </ul>
-            </>
-          )}
-        </ListBox>
-      </main>
+      <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef} />
+      <Main movies={movies} detailsMovieRef={detailsMovieRef} />
     </>
   )
 }
