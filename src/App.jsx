@@ -4,6 +4,7 @@ import { useMovies } from "./hooks/use-movies"
 
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
+const getMoviePoster = moviePoster => moviePoster === "N/A" ? "404-img.jpg" : moviePoster
 
 const apiKey = import.meta.env.VITE_API_KEY
 
@@ -52,7 +53,7 @@ const WatchedMovies = ({ watchedMovies, onClickBtnDelete, onClickMovie }) => {
     watchedMovies.map((watchedMovie) => (
       <li key={watchedMovie.id} onClick={() => onClickMovie(watchedMovie)}>
         <img
-          src={watchedMovie.poster}
+          src={getMoviePoster(watchedMovie.poster)}
           alt={`Poster de ${watchedMovie.title}`}
         />
         <h3>{watchedMovie.title}</h3>
@@ -93,7 +94,7 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
           &larr;
         </button>
         <img
-          src={clickedMovie.poster}
+          src={getMoviePoster(clickedMovie.poster)}
           alt={`Poster de ${clickedMovie.title}`}
         />
         <div className="details-overview">
@@ -139,7 +140,7 @@ const Movies = ({ movies, onClickMovie }) => {
   return (
     movies.map((movie) => (
       <li key={movie.id} onClick={() => onClickMovie(movie)}>
-        <img src={movie.poster} alt={`Poster de ${movie.title}`} />
+        <img src={getMoviePoster(movie.poster)} alt={`Poster de ${movie.title}`} />
         <h3>{movie.title}</h3>
         <p>
           <span>📅</span>
