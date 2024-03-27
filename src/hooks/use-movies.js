@@ -1,24 +1,12 @@
-import { useState, useEffect } from "react"
-
-const apiKey = import.meta.env.VITE_API_KEY
+import { useState } from "react"
 
 const useMovies = () => {
-  const [movies, setMovies] = useState([])
-  const [clickedMovie, setClickedMovie] = useState(null)
   const [watchedMovies, setWatchedMovies] = useState([])
+  const [clickedMovie, setClickedMovie] = useState(null)
 
-  useEffect(() => {
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
-      .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => ({
-        id: movie.imdbID,
-        title: movie.Title,
-        year: movie.Year,
-        poster: movie.Poster
-      }))))
-      .catch(console.log)
-  }, [])
-
+  const handleClickBtnBack = () => setClickedMovie(null)
+  const handleClickBtnDelete = movieId =>
+    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
   const handleClickMovie = currentClickedMovie => {
     const prevClickedMovie = clickedMovie
     if (prevClickedMovie?.id === currentClickedMovie.id) {
@@ -53,7 +41,7 @@ const useMovies = () => {
       ))
       .catch(console.log)
   }
-
+  
   const handleSubmitWatchedMovie = e => {
     e.preventDefault()
     const { rating } = e.target.elements
@@ -73,39 +61,14 @@ const useMovies = () => {
     setClickedMovie(null)
   }
 
-  const handleSearchMovie = e => {
-    e.preventDefault()
-    const { searchMovie } = e.target.elements
-
-    if (searchMovie.value.length < 2) {
-      return
-    }
-
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
-      .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => ({
-        id: movie.imdbID,
-        title: movie.Title,
-        year: movie.Year,
-        poster: movie.Poster
-      }))))
-      .catch(console.log)
-  }
-
-  const handleClickBtnBack = () => setClickedMovie(null)
-  const handleClickBtnDelete = movieId =>
-    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
-
   return { 
-          movies, 
-          clickedMovie, 
-          watchedMovies, 
-          handleClickMovie, 
-          handleSubmitWatchedMovie, 
-          handleSearchMovie,
-          handleClickBtnBack,
-          handleClickBtnDelete
-        }
+    watchedMovies, 
+    clickedMovie, 
+    handleClickMovie, 
+    handleSubmitWatchedMovie, 
+    handleClickBtnBack, 
+    handleClickBtnDelete 
+  }
 }
 
 export { useMovies }

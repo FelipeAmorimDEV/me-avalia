@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 
+import { useMovies } from "./hooks/use-movies"
+
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
 
@@ -27,9 +29,7 @@ const NavBar = ({ onSearchMovie, movies }) => {
     </nav>)
 }
 
-const ListBox = ({ children }) => {
-  return <ul className='box'>{children}</ul>
-}
+const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 
 const History = ({ watchedMovies }) => {
   return (
@@ -127,9 +127,7 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
             </div>
           </form>
         </div>
-        <p>
-          <em>{clickedMovie.plot}</em>
-        </p>
+        <p><em>{clickedMovie.plot}</em></p>
         <p>Elenco: {clickedMovie.actors}</p>
         <p>Direção: {clickedMovie.director}</p>
       </section>
@@ -152,66 +150,15 @@ const Movies = ({ movies, onClickMovie }) => {
 }
 
 const Main = ({ movies }) => {
-  const [clickedMovie, setClickedMovie] = useState(null)
-  const [watchedMovies, setWatchedMovies] = useState([])
-
-  const handleClickBtnBack = () => setClickedMovie(null)
-  const handleClickBtnDelete = movieId =>
-    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
-  const handleClickMovie = currentClickedMovie => {
-    const prevClickedMovie = clickedMovie
-    if (prevClickedMovie?.id === currentClickedMovie.id) {
-      setClickedMovie(null)
-      return
-    }
-
-    const watchedMovie = watchedMovies
-      .find((watchedMovie) => watchedMovie.id === currentClickedMovie.id)
-
-    if (watchedMovie) {
-      setClickedMovie(watchedMovie)
-      return
-    }
-
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
-      .then(r => r.json())
-      .then(data => setClickedMovie(
-        {
-          id: data.imdbID,
-          title: data.Title,
-          year: data.Year,
-          released: data.Released,
-          runtime: data.Runtime,
-          genre: data.Genre,
-          director: data.Director,
-          actors: data.Actors,
-          poster: data.Poster,
-          imdbRating: data.imdbRating,
-          plot: data.Plot
-        }
-      ))
-      .catch(console.log)
-  }
-
-  const handleSubmitWatchedMovie = e => {
-    e.preventDefault()
-    const { rating } = e.target.elements
-
-    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id)
-
-    if (isMovieInWatchedList) {
-      setWatchedMovies(wm => wm.map(movie =>
-        movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie
-      ))
-      setClickedMovie(null)
-
-      return
-    }
-
-    setWatchedMovies((wm) => [...wm, { ...clickedMovie, userRating: +rating.value }])
-    setClickedMovie(null)
-  }
-
+  const { 
+    clickedMovie, 
+    watchedMovies, 
+    handleClickMovie, 
+    handleSubmitWatchedMovie, 
+    handleClickBtnBack, 
+    handleClickBtnDelete
+  } = useMovies()
+ 
   return (
     <main className="main">
       <ListBox>
@@ -248,16 +195,11 @@ const Main = ({ movies }) => {
 const App = () => {
   const [movies, setMovies] = useState([])
 
-
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
       .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => ({
-        id: movie.imdbID,
-        title: movie.Title,
-        year: movie.Year,
-        poster: movie.Poster
-      }))))
+      .then((data) => setMovies(data.Search.map((movie) => 
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster}))))
       .catch(console.log)
   }, [])
 
@@ -273,12 +215,8 @@ const App = () => {
 
     fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
       .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) => ({
-        id: movie.imdbID,
-        title: movie.Title,
-        year: movie.Year,
-        poster: movie.Poster
-      }))))
+      .then((data) => setMovies(data.Search.map((movie) => 
+        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster}))))
       .catch(console.log)
   }
 
