@@ -1,7 +1,9 @@
-import { useMovies } from './hooks/useMovies'
+import { useState, useEffect } from "react"
 
 const getTotalMinutes = watchedMovies => watchedMovies
   .reduce((acc, item) => acc + (item.runtime === "N/A" ? 0 : +item.runtime.split(" ")[0]), 0)
+
+const apiKey = import.meta.env.VITE_API_KEY
 
 const NavBar = ({ onSearchMovie, movies }) => {
   return (
@@ -135,60 +137,151 @@ const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie }) =>
   )
 }
 
+const Main = ({ movies }) => {
+  const [clickedMovie, setClickedMovie] = useState(null)
+  const [watchedMovies, setWatchedMovies] = useState([])
+
+  const handleClickBtnBack = () => setClickedMovie(null)
+  const handleClickBtnDelete = movieId =>
+    setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
+  const handleClickMovie = currentClickedMovie => {
+    const prevClickedMovie = clickedMovie
+    if (prevClickedMovie?.id === currentClickedMovie.id) {
+      setClickedMovie(null)
+      return
+    }
+
+    const watchedMovie = watchedMovies
+      .find((watchedMovie) => watchedMovie.id === currentClickedMovie.id)
+
+    if (watchedMovie) {
+      setClickedMovie(watchedMovie)
+      return
+    }
+
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
+      .then(r => r.json())
+      .then(data => setClickedMovie(
+        {
+          id: data.imdbID,
+          title: data.Title,
+          year: data.Year,
+          released: data.Released,
+          runtime: data.Runtime,
+          genre: data.Genre,
+          director: data.Director,
+          actors: data.Actors,
+          poster: data.Poster,
+          imdbRating: data.imdbRating,
+          plot: data.Plot
+        }
+      ))
+      .catch(console.log)
+  }
+
+  const handleSubmitWatchedMovie = e => {
+    e.preventDefault()
+    const { rating } = e.target.elements
+
+    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id)
+
+    if (isMovieInWatchedList) {
+      setWatchedMovies(wm => wm.map(movie =>
+        movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie
+      ))
+      setClickedMovie(null)
+
+      return
+    }
+
+    setWatchedMovies((wm) => [...wm, { ...clickedMovie, userRating: +rating.value }])
+    setClickedMovie(null)
+  }
+
+  return (
+    <main className="main">
+      <ListBox>
+        <ul className="list list-movies">
+          {movies.length > 0 &&
+            movies.map((movie) => (
+              <li key={movie.id} onClick={() => handleClickMovie(movie)}>
+                <img src={movie.poster} alt={`Poster de ${movie.title}`} />
+                <h3>{movie.title}</h3>
+                <p>
+                  <span>📅</span>
+                  <span>{movie.year}</span>
+                </p>
+              </li>
+            ))}
+        </ul>
+      </ListBox>
+      <ListBox>
+        {clickedMovie ? (
+          <MovieDetails
+            clickedMovie={clickedMovie}
+            onClickBtnBack={handleClickBtnBack}
+            onSubmitWatchedMovie={handleSubmitWatchedMovie}
+          />
+        ) : (
+          <>
+            <History watchedMovies={watchedMovies} />
+            <ul className="list list-movies">
+              {watchedMovies.length > 0 &&
+                <WatchedMovies
+                  watchedMovies={watchedMovies}
+                  onClickBtnDelete={handleClickBtnDelete}
+                  onClickMovie={handleClickMovie}
+                />
+              }
+            </ul>
+          </>
+        )}
+      </ListBox>
+    </main>
+  )
+}
+
 const App = () => {
-  const {
-    movies, 
-    clickedMovie, 
-    watchedMovies, 
-    handleSearchMovie, 
-    handleClickMovie, 
-    handleSubmitWatchedMovie, 
-    handleClickBtnBack, 
-    handleClickBtnDelete 
-  } = useMovies()
+  const [movies, setMovies] = useState([])
+  
+
+  useEffect(() => {
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) => ({
+        id: movie.imdbID,
+        title: movie.Title,
+        year: movie.Year,
+        poster: movie.Poster
+      }))))
+      .catch(console.log)
+  }, [])
+
+  
+
+  const handleSearchMovie = e => {
+    e.preventDefault()
+    const { searchMovie } = e.target.elements
+
+    if (searchMovie.value.length < 2) {
+      return
+    }
+
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
+      .then((r) => r.json())
+      .then((data) => setMovies(data.Search.map((movie) => ({
+        id: movie.imdbID,
+        title: movie.Title,
+        year: movie.Year,
+        poster: movie.Poster
+      }))))
+      .catch(console.log)
+  }
 
   return (
     <>
       <NavBar movies={movies} onSearchMovie={handleSearchMovie} />
-      <main className="main">
-        <ListBox>
-          <ul className="list list-movies">
-            {movies.length > 0 &&
-              movies.map((movie) => (
-                <li key={movie.id} onClick={() => handleClickMovie(movie)}>
-                  <img src={movie.poster} alt={`Poster de ${movie.title}`} />
-                  <h3>{movie.title}</h3>
-                  <p>
-                    <span>📅</span>
-                    <span>{movie.year}</span>
-                  </p>
-                </li>
-              ))}
-          </ul>
-        </ListBox>
-        <ListBox>
-          {clickedMovie ? (
-            <MovieDetails
-              clickedMovie={clickedMovie}
-              onClickBtnBack={handleClickBtnBack}
-              onSubmitWatchedMovie={handleSubmitWatchedMovie}
-            />
-          ) : (
-            <>
-              <History watchedMovies={watchedMovies} />
-              <ul className="list list-movies">
-                {watchedMovies.length > 0 &&
-                  <WatchedMovies
-                    watchedMovies={watchedMovies}
-                    onClickBtnDelete={handleClickBtnDelete}
-                    onClickMovie={handleClickMovie}
-                  />
-                }
-              </ul>
-            </>
-          )}
-        </ListBox>
-      </main>
+      <Main movies={movies}/>
     </>
   )
 }
