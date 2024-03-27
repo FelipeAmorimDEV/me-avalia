@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 import { useMovies } from "./hooks/use-movies"
 
@@ -9,10 +9,19 @@ const getMoviePoster = moviePoster => moviePoster === "N/A" ? "404-img.jpg" : mo
 const apiKey = import.meta.env.VITE_API_KEY
 
 const NavBar = ({ onSearchMovie, movies }) => {
+  const formRef = useRef(null)
+
+  useEffect(() => {
+    console.log(formRef)
+    if(movies.length > 0) {
+      formRef.current.reset()
+    }
+  }, [movies])
+
   return (
     <nav className="nav-bar">
       <img src="logo-me-avalia.png" alt="Logo me avalia" className="logo" />
-      <form className="form-search" onSubmit={onSearchMovie}>
+      <form ref={formRef} className="form-search" onSubmit={onSearchMovie}>
         <input
           type="text"
           name="searchMovie"
@@ -203,8 +212,6 @@ const App = () => {
         ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster}))))
       .catch(console.log)
   }, [])
-
-
 
   const handleSearchMovie = e => {
     e.preventDefault()
