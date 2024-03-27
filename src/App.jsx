@@ -157,7 +157,7 @@ const Main = ({ movies }) => {
     handleSubmitWatchedMovie, 
     handleClickBtnBack, 
     handleClickBtnDelete
-  } = useMovies()
+  } = useMovies(apiKey)
  
   return (
     <main className="main">
