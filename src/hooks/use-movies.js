@@ -61,18 +61,13 @@ const useMovies = apiKey => {
     e.preventDefault()
     const { rating } = e.target.elements
 
-    const isMovieInWatchedList = watchedMovies.some((movie) => movie.id === clickedMovie.id)
-
-    if (isMovieInWatchedList) {
-      setWatchedMovies(wm => wm.map(movie =>
-        movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie
-      ))
-      setClickedMovie(null)
-
-      return
-    }
-
-    setWatchedMovies((wm) => [...wm, { ...clickedMovie, userRating: +rating.value }])
+    setWatchedMovies((wm) => {
+      const isMovieAlreadyWatched = wm.some((movie) => movie.id === clickedMovie.id)
+      return isMovieAlreadyWatched 
+      ? wm
+        .map((movie) => movie.id === clickedMovie.id ? { ...movie, userRating: +rating.value } : movie)
+      : [...wm, { ...clickedMovie, userRating: +rating.value }]
+    })
     setClickedMovie(null)
   }
 
