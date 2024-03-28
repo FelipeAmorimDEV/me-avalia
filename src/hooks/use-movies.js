@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { apiKey } from "@/App"
 import localforage from "localforage"
+import { baseUrl } from "@/utils/base-url"
 
 const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
@@ -39,7 +40,7 @@ const useMovies = () => {
       return
     }
 
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
+    fetch(`${baseUrl}&i=${currentClickedMovie.id}`)
       .then(r => r.json())
       .then(data => setClickedMovie(
         {

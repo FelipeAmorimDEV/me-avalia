@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react"
-import { NavBar } from "./components/navbar"
-import { Main } from "./components/main"
-
-const apiKey = import.meta.env.VITE_API_KEY
+import { NavBar } from "@/components/navbar"
+import { Main } from "@/components/main"
+import { baseUrl } from "@/utils/base-url"
 
 const App = () => {
   const [movies, setMovies] = useState([])
   const detailsMovieRef = useRef(null)
 
   useEffect(() => {
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=the%20matrix`)
+    fetch(`${baseUrl}&s=the%20matrix`)
       .then((r) => r.json())
       .then((data) => setMovies(data.Search.map((movie) =>
         ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
@@ -24,7 +23,7 @@ const App = () => {
       return
     }
 
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchMovie.value}`)
+    fetch(`${baseUrl}&s=${searchMovie.value}`)
       .then((r) => r.json())
       .then((data) => setMovies(data.Search.map((movie) =>
         ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
