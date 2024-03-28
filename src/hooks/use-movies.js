@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
+import { apiKey } from "../App"
 import localforage from "localforage"
 
-const useMovies = apiKey => {
+const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
 
@@ -19,6 +20,7 @@ const useMovies = apiKey => {
       })
       .catch(error => alert(error.message))
   }, [])
+  
   const handleClickBtnBack = () => setClickedMovie(null)
   const handleClickBtnDelete = movieId =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
