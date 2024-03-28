@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { apiKey } from "../App"
+import { apiKey } from "@/App"
 import localforage from "localforage"
 
 const useMovies = () => {
