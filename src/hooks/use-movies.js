@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import localforage from 'localforage'
 import { baseUrl } from '@/utils/base-url'
+import { request } from '@/utils/request'
+import { useLoading } from '@/hooks/use-loading'
 
 const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
+  const [isFetchingMovieDetails, setIsFetchingMovieDetails] = useLoading()
 
   useEffect(() => {
     localforage.setItem('meAvalia', watchedMovies)
@@ -38,25 +41,25 @@ const useMovies = () => {
       setClickedMovie(watchedMovie)
       return
     }
-
-    fetch(`${baseUrl}&i=${currentClickedMovie.id}`)
-      .then(r => r.json())
-      .then(data => setClickedMovie(
-        {
-          id: data.imdbID,
-          title: data.Title,
-          year: data.Year,
-          released: data.Released,
-          runtime: data.Runtime,
-          genre: data.Genre,
-          director: data.Director,
-          actors: data.Actors,
-          poster: data.Poster,
-          imdbRating: data.imdbRating,
-          plot: data.Plot
-        }
-      ))
-      .catch(console.log)
+    
+    setIsFetchingMovieDetails(true)
+    request({
+      url: `${baseUrl}&i=${currentClickedMovie.id}`,
+      onSuccess: data => setClickedMovie({
+        id: data.imdbID,
+        title: data.Title,
+        year: data.Year,
+        released: data.Released,
+        runtime: data.Runtime,
+        genre: data.Genre,
+        director: data.Director,
+        actors: data.Actors,
+        poster: data.Poster,
+        imdbRating: data.imdbRating,
+        plot: data.Plot
+      }),
+      onFinally: () => setIsFetchingMovieDetails(false)
+    })
   }
   
   const handleSubmitWatchedMovie = rating => {
@@ -77,7 +80,8 @@ const useMovies = () => {
     handleSubmitWatchedMovie, 
     handleClickBtnBack, 
     handleClickBtnDelete,
-    setClickedMovie
+    setClickedMovie,
+    isFetchingMovieDetails
   }
 }
 

@@ -6,7 +6,7 @@ import { MovieDetails } from '@/components/movie-details'
 
 const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 
-const Main = ({ movies, detailsMovieRef }) => {
+const Main = ({ movies, detailsMovieRef, isFetchingMovie }) => {
   const {
     clickedMovie,
     watchedMovies,
@@ -14,7 +14,8 @@ const Main = ({ movies, detailsMovieRef }) => {
     handleSubmitWatchedMovie,
     handleClickBtnBack,
     handleClickBtnDelete,
-    setClickedMovie
+    setClickedMovie,
+    isFetchingMovieDetails
   } = useMovies()
 
   detailsMovieRef.current = setClickedMovie
@@ -23,31 +24,32 @@ const Main = ({ movies, detailsMovieRef }) => {
     <main className="main">
       <ListBox>
         <ul className="list list-movies">
-          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie} />}
+          {movies.length > 0 && <Movies movies={movies} onClickMovie={handleClickMovie} isFetchingMovie={isFetchingMovie} />}
         </ul>
       </ListBox>
       <ListBox>
-        {clickedMovie ? (
-          <MovieDetails
-            clickedMovie={clickedMovie}
-            onClickBtnBack={handleClickBtnBack}
-            onSubmitWatchedMovie={handleSubmitWatchedMovie}
-            watchedMovies={watchedMovies}
-          />
-        ) : (
-          <>
-            <History watchedMovies={watchedMovies} />
-            <ul className="list list-movies">
-              {watchedMovies.length > 0 &&
-                <WatchedMovies
-                  watchedMovies={watchedMovies}
-                  onClickBtnDelete={handleClickBtnDelete}
-                  onClickMovie={handleClickMovie}
-                />
-              }
-            </ul>
-          </>
-        )}
+        {isFetchingMovieDetails ? <p className='loader'>Carregando...</p> :
+          clickedMovie ? (
+            <MovieDetails
+              clickedMovie={clickedMovie}
+              onClickBtnBack={handleClickBtnBack}
+              onSubmitWatchedMovie={handleSubmitWatchedMovie}
+              watchedMovies={watchedMovies}
+            />
+          ) : (
+            <>
+              <History watchedMovies={watchedMovies} />
+              <ul className="list list-movies">
+                {watchedMovies.length > 0 &&
+                  <WatchedMovies
+                    watchedMovies={watchedMovies}
+                    onClickBtnDelete={handleClickBtnDelete}
+                    onClickMovie={handleClickMovie}
+                  />
+                }
+              </ul>
+            </>
+          )}
       </ListBox>
     </main>
   )

@@ -2,17 +2,21 @@ import { useState, useEffect, useRef } from 'react'
 import { NavBar } from '@/components/navbar'
 import { Main } from '@/components/main'
 import { baseUrl } from '@/utils/base-url'
+import { request } from '@/utils/request'
+import { useLoading } from '@/hooks/use-loading'
 
 const App = () => {
   const [movies, setMovies] = useState([])
   const detailsMovieRef = useRef(null)
+  const [isFetchingMovie, setIsFetchingMovie] = useLoading()
 
   useEffect(() => {
-    fetch(`${baseUrl}&s=the%20matrix`)
-      .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) =>
-        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
-      .catch(console.log)
+    setIsFetchingMovie(true)
+    request({
+      url: `${baseUrl}&s=the%20matrix`,
+      onSuccess: data => setMovies(data.Search.map(movie => ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))),
+      onFinally: () => setIsFetchingMovie(false)
+    })
   }, [])
 
   const handleSearchMovie = e => {
@@ -23,17 +27,18 @@ const App = () => {
       return
     }
 
-    fetch(`${baseUrl}&s=${searchMovie.value}`)
-      .then((r) => r.json())
-      .then((data) => setMovies(data.Search.map((movie) =>
-        ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))))
-      .catch(console.log)
+    setIsFetchingMovie(true)
+    request({
+      url: `${baseUrl}&s=${searchMovie.value}`,
+      onSuccess: data => setMovies(data.Search.map(movie => ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))),
+      onFinally: () => setIsFetchingMovie(false)
+    })
   }
 
   return (
     <>
       <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef} />
-      <Main movies={movies} detailsMovieRef={detailsMovieRef} />
+      <Main movies={movies} detailsMovieRef={detailsMovieRef} isFetchingMovie={isFetchingMovie}/>
     </>
   )
 }
