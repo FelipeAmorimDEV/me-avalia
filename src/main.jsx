@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client'
-import { App } from './App.jsx'
-import './styles.css'
+import { App } from '@/App.jsx'
+import '@/styles.css'
 
 const element = document.querySelector('[data-js="root"]')
 

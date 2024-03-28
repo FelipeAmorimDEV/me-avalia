@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react"
-import localforage from "localforage"
+import { useEffect, useState } from 'react'
+import { apiKey } from '@/App'
+import localforage from 'localforage'
+import { baseUrl } from '@/utils/base-url'
 
-const useMovies = apiKey => {
+const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
 
   useEffect(() => {
-    localforage.setItem("meAvalia", watchedMovies)
+    localforage.setItem('meAvalia', watchedMovies)
       .catch(error => alert(error.message))
   }, [watchedMovies])
 
   useEffect(() => {
-    localforage.getItem("meAvalia")
+    localforage.getItem('meAvalia')
       .then(value => {
         if (value) {
           setWatchedMovies(value)
@@ -19,6 +21,7 @@ const useMovies = apiKey => {
       })
       .catch(error => alert(error.message))
   }, [])
+  
   const handleClickBtnBack = () => setClickedMovie(null)
   const handleClickBtnDelete = movieId =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
@@ -37,7 +40,7 @@ const useMovies = apiKey => {
       return
     }
 
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${currentClickedMovie.id}`)
+    fetch(`${baseUrl}&i=${currentClickedMovie.id}`)
       .then(r => r.json())
       .then(data => setClickedMovie(
         {
