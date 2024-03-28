@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react"
-import { NavBar } from "@/components/navbar"
-import { Main } from "@/components/main"
-import { baseUrl } from "@/utils/base-url"
+import { useState, useEffect, useRef } from 'react'
+import { NavBar } from '@/components/navbar'
+import { Main } from '@/components/main'
+import { baseUrl } from '@/utils/base-url'
 
 const App = () => {
   const [movies, setMovies] = useState([])

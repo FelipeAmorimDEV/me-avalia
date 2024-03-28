@@ -1,8 +1,8 @@
-import { useMovies } from "@/hooks/use-movies"
+import { useMovies } from '@/hooks/use-movies'
 import { History } from '@/components/history'
-import { WatchedMovies } from "@/components/watched-movies"
-import { Movies } from "@/components/movies"
-import { MovieDetails } from "@/components/movie-details"
+import { WatchedMovies } from '@/components/watched-movies'
+import { Movies } from '@/components/movies'
+import { MovieDetails } from '@/components/movie-details'
 
 const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 

@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { StarRating } from "@/components/stars-rating"
-import { getMoviePoster } from "@/utils/get-movie-poster"
+import { useState } from 'react'
+import { StarRating } from '@/components/stars-rating'
+import { getMoviePoster } from '@/utils/get-movie-poster'
 
 const MovieDetails = ({ onClickBtnBack, clickedMovie, onSubmitWatchedMovie, watchedMovies }) => {
   const userRating = watchedMovies.find((m) => m.id === clickedMovie.id)?.userRating

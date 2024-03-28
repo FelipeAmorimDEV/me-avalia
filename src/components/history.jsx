@@ -1,4 +1,4 @@
-import { getTotalMinutes } from "@/utils/get-total-minutes"
+import { getTotalMinutes } from '@/utils/get-total-minutes'
 
 const History = ({ watchedMovies }) => {
   return (

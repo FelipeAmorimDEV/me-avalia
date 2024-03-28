@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react"
-import { apiKey } from "@/App"
-import localforage from "localforage"
-import { baseUrl } from "@/utils/base-url"
+import { useEffect, useState } from 'react'
+import { apiKey } from '@/App'
+import localforage from 'localforage'
+import { baseUrl } from '@/utils/base-url'
 
 const useMovies = () => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [clickedMovie, setClickedMovie] = useState(null)
 
   useEffect(() => {
-    localforage.setItem("meAvalia", watchedMovies)
+    localforage.setItem('meAvalia', watchedMovies)
       .catch(error => alert(error.message))
   }, [watchedMovies])
 
   useEffect(() => {
-    localforage.getItem("meAvalia")
+    localforage.getItem('meAvalia')
       .then(value => {
         if (value) {
           setWatchedMovies(value)

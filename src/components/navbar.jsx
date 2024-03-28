@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef } from 'react'
 
 const NavBar = ({ onSearchMovie, movies, detailsMovieRef }) => {
   const formRef = useRef(null)
