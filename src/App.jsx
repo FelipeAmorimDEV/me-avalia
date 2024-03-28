@@ -38,4 +38,4 @@ const App = () => {
   )
 }
 
-export { App, apiKey }
+export { App }
