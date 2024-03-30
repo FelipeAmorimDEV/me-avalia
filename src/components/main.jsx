@@ -15,7 +15,7 @@ const Main = ({ movies, detailsMovieRef, isFetchingMovie }) => {
   const {
     clickedMovie,
     handleClickMovie,
-    setClickedMovie,
+    resetClickedMovie,
     isFetchingMovieDetails
   } = useClickedMovie({ watchedMoviesRef })
 
@@ -24,9 +24,9 @@ const Main = ({ movies, detailsMovieRef, isFetchingMovie }) => {
     handleSubmitWatchedMovie, 
     handleClickBtnBack, 
     handleClickBtnDelete 
-  } = useWatchedMovies({ clickedMovie, setClickedMovie, watchedMoviesRef })
+  } = useWatchedMovies({ clickedMovie, resetClickedMovie, watchedMoviesRef })
 
-  detailsMovieRef.current = setClickedMovie
+  detailsMovieRef.current = resetClickedMovie
 
   return (
     <main className="main">

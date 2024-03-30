@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import localforage from 'localforage'
 
-const useWatchedMovies = ({ setClickedMovie, clickedMovie, watchedMoviesRef }) => {
+const useWatchedMovies = ({ resetClickedMovie, clickedMovie, watchedMoviesRef }) => {
   const [watchedMovies, setWatchedMovies] = useState([])
 
   watchedMoviesRef.current = watchedMovies
@@ -21,7 +21,7 @@ const useWatchedMovies = ({ setClickedMovie, clickedMovie, watchedMoviesRef }) =
       .catch(error => alert(error.message))
   }, [])
 
-  const handleClickBtnBack = () => setClickedMovie(null)
+  const handleClickBtnBack = () => resetClickedMovie()
   const handleClickBtnDelete = movieId =>
     setWatchedMovies(watchedMovies.filter((movie) => movie.id !== movieId))
 
@@ -33,7 +33,7 @@ const useWatchedMovies = ({ setClickedMovie, clickedMovie, watchedMoviesRef }) =
           .map((movie) => movie.id === clickedMovie.id ? { ...movie, userRating: rating } : movie)
         : [...wm, { ...clickedMovie, userRating: rating }]
     })
-    setClickedMovie(null)
+    resetClickedMovie()
   }
 
   return { watchedMovies, handleSubmitWatchedMovie, handleClickBtnBack, handleClickBtnDelete }
