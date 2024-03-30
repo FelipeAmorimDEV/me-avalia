@@ -6,7 +6,7 @@ const NavBar = ({ onSearchMovie, movies, detailsMovieRef }) => {
   useEffect(() => {
     if (formRef.current.elements.searchMovie.value.length > 0) {
       formRef.current.reset()
-      detailsMovieRef.current(null)
+      detailsMovieRef.current()
     }
   }, [movies, detailsMovieRef])
 
