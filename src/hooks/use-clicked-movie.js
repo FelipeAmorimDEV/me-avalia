@@ -1,16 +1,38 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
 import { baseUrl } from '@/utils/base-url'
 import { request } from '@/utils/request'
 import { useLoading } from '@/hooks/use-loading'
 
+const createMovieElement = data => ({
+  id: data.imdbID,
+  title: data.Title,
+  year: data.Year,
+  released: data.Released,
+  runtime: data.Runtime,
+  genre: data.Genre,
+  director: data.Director,
+  actors: data.Actors,
+  poster: data.Poster,
+  imdbRating: data.imdbRating,
+  plot: data.Plot
+})
+
+const reducer = (state, action) => ({
+  dismissed_movie: { ...state, clickedMovie: null },
+  fetched_movie: { ...state, clickedMovie: action?.movie && createMovieElement(action.movie) },
+  set_watched_movie: { ...state, clickedMovie: action.movie }
+})[action.type] || state
+
 const useClickedMovie = ({ watchedMoviesRef }) => {
-  const [clickedMovie, setClickedMovie] = useState(null)
+  const [state, dispatch] = useReducer(reducer, { clickedMovie: null })
   const [isFetchingMovieDetails, setIsFetchingMovieDetails] = useLoading()
 
+  const resetClickedMovie = () => dispatch({ type: 'dismissed_movie'})
+
   const handleClickMovie = currentClickedMovie => {
-    const prevClickedMovie = clickedMovie
+    const prevClickedMovie = state.clickedMovie
     if (prevClickedMovie?.id === currentClickedMovie.id) {
-      setClickedMovie(null)
+      resetClickedMovie()
       return
     }
 
@@ -18,34 +40,22 @@ const useClickedMovie = ({ watchedMoviesRef }) => {
       .find((watchedMovie) => watchedMovie.id === currentClickedMovie.id)
 
     if (watchedMovie) {
-      setClickedMovie(watchedMovie)
+      dispatch({ type: 'set_watched_movie', movie: watchedMovie })
       return
     }
     
     setIsFetchingMovieDetails(true)
     request({
       url: `${baseUrl}&i=${currentClickedMovie.id}`,
-      onSuccess: data => setClickedMovie({
-        id: data.imdbID,
-        title: data.Title,
-        year: data.Year,
-        released: data.Released,
-        runtime: data.Runtime,
-        genre: data.Genre,
-        director: data.Director,
-        actors: data.Actors,
-        poster: data.Poster,
-        imdbRating: data.imdbRating,
-        plot: data.Plot
-      }),
+      onSuccess: data => dispatch({ type: 'fetched_movie', movie: data }),
       onFinally: () => setIsFetchingMovieDetails(false)
     })
   }
 
   return { 
-    clickedMovie, 
+    clickedMovie: state.clickedMovie, 
     handleClickMovie, 
-    setClickedMovie,
+    resetClickedMovie,
     isFetchingMovieDetails
   }
 }
