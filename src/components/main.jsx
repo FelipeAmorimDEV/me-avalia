@@ -3,6 +3,7 @@ import { History } from '@/components/history'
 import { WatchedMovies } from '@/components/watched-movies'
 import { Movies } from '@/components/movies'
 import { MovieDetails } from '@/components/movie-details'
+import { Loader } from './loader'
 
 const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 
@@ -28,7 +29,7 @@ const Main = ({ movies, detailsMovieRef, isFetchingMovie }) => {
         </ul>
       </ListBox>
       <ListBox>
-        {isFetchingMovieDetails ? <p className='loader'>Carregando...</p> :
+        {isFetchingMovieDetails ? <Loader /> :
           clickedMovie ? (
             <MovieDetails
               clickedMovie={clickedMovie}
