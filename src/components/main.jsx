@@ -1,23 +1,30 @@
-import { useMovies } from '@/hooks/use-movies'
+import { useClickedMovie } from '@/hooks/use-clicked-movie'
 import { History } from '@/components/history'
 import { WatchedMovies } from '@/components/watched-movies'
 import { Movies } from '@/components/movies'
 import { MovieDetails } from '@/components/movie-details'
 import { Loader } from './loader'
+import { useWatchedMovies } from '../hooks/use-watched-movies'
+import { useRef } from 'react'
 
 const ListBox = ({ children }) => <ul className='box'>{children}</ul>
 
 const Main = ({ movies, detailsMovieRef, isFetchingMovie }) => {
+  const watchedMoviesRef = useRef(null)
+
   const {
     clickedMovie,
-    watchedMovies,
     handleClickMovie,
-    handleSubmitWatchedMovie,
-    handleClickBtnBack,
-    handleClickBtnDelete,
     setClickedMovie,
     isFetchingMovieDetails
-  } = useMovies()
+  } = useClickedMovie({ watchedMoviesRef })
+
+  const { 
+    watchedMovies, 
+    handleSubmitWatchedMovie, 
+    handleClickBtnBack, 
+    handleClickBtnDelete 
+  } = useWatchedMovies({ clickedMovie, setClickedMovie, watchedMoviesRef })
 
   detailsMovieRef.current = setClickedMovie
 
