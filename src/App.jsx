@@ -1,12 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useReducer, useEffect, useRef } from 'react'
 import { NavBar } from '@/components/navbar'
 import { Main } from '@/components/main'
 import { baseUrl } from '@/utils/base-url'
 import { request } from '@/utils/request'
 import { useLoading } from '@/hooks/use-loading'
 
+const reducer = (state, action) => ({
+  init_fetch: {...state, movies: action.movie?.Search.map( m => ({ id: m.imdbID, title: m.Title, year: m.Year, poster: m.Poster }))},
+  searched_movie: {...state, movies: action.movie?.Search.map( m => ({ id: m.imdbID, title: m.Title, year: m.Year, poster: m.Poster }))}
+})[action.type] || state
+
 const App = () => {
-  const [movies, setMovies] = useState([])
+  const [state, dispatch] = useReducer(reducer, { movies: [] })
   const detailsMovieRef = useRef(null)
   const [isFetchingMovie, setIsFetchingMovie] = useLoading()
 
@@ -14,7 +19,7 @@ const App = () => {
     setIsFetchingMovie(true)
     request({
       url: `${baseUrl}&s=the%20matrix`,
-      onSuccess: data => setMovies(data.Search.map(movie => ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))),
+      onSuccess: data => dispatch({type: 'init_fetch', movie: data}),
       onFinally: () => setIsFetchingMovie(false)
     })
   }, [])
@@ -30,15 +35,15 @@ const App = () => {
     setIsFetchingMovie(true)
     request({
       url: `${baseUrl}&s=${searchMovie.value}`,
-      onSuccess: data => setMovies(data.Search.map(movie => ({ id: movie.imdbID, title: movie.Title, year: movie.Year, poster: movie.Poster }))),
+      onSuccess: data => dispatch({ type: 'searched_movie', movie: data }),
       onFinally: () => setIsFetchingMovie(false)
     })
   }
 
   return (
     <>
-      <NavBar movies={movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef} />
-      <Main movies={movies} detailsMovieRef={detailsMovieRef} isFetchingMovie={isFetchingMovie}/>
+      <NavBar movies={state.movies} onSearchMovie={handleSearchMovie} detailsMovieRef={detailsMovieRef} />
+      <Main movies={state.movies} detailsMovieRef={detailsMovieRef} isFetchingMovie={isFetchingMovie}/>
     </>
   )
 }
